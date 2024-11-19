@@ -1,14 +1,3 @@
-terraform {
-  cloud {
-    organization = "lucasvinals_personal"
-
-    workspaces {
-      project = "TerraformCourse"
-      tags = [ "CreatedBy_Lktz" ]
-    }
-  }
-}
-
 module "dns" {
   source = "./dnsZone"
 }
