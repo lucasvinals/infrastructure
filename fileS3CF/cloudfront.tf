@@ -1,5 +1,5 @@
 locals {
-  functionName = "SecureHeaders-${title(terraform.workspace)}"
+  functionName = "SecureHeaders-${local.environment}"
 }
 
 resource "aws_cloudfront_function" "secureHeaders" {
@@ -31,7 +31,7 @@ resource "aws_cloudfront_response_headers_policy" "SecureHeaders" {
     }
 
     access_control_allow_origins {
-      items = [ local.route53Alias ]
+      items = [ "*.${var.dnsHostedZoneName}" ]
     }
 
     access_control_max_age_sec = 600
@@ -98,19 +98,19 @@ data "aws_cloudfront_origin_request_policy" "CORS-S3Origin" {
   id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Import from Managed AWS Policy
 }
 
-resource aws_cloudfront_origin_access_control resume {
-  name                              = "S3Access"
-  description                       = "Access to S3 buckets"
+resource aws_cloudfront_origin_access_control S3 {
+  name                              = "S3Access${local.environment}"
+  description                       = "Access to S3 buckets - ${local.environment} environment"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
 
-resource "aws_cloudfront_distribution" "resume" {
+resource "aws_cloudfront_distribution" "main" {
   origin {
-    domain_name = aws_s3_bucket.resumeOrigin.bucket_regional_domain_name
-    origin_id = "S3"
-    origin_access_control_id = aws_cloudfront_origin_access_control.resume.id
+    domain_name = aws_s3_bucket.main.bucket_regional_domain_name
+    origin_id = aws_cloudfront_origin_access_control.S3.name
+    origin_access_control_id = aws_cloudfront_origin_access_control.S3.id
   }
 
   aliases = [ local.route53Alias ]
@@ -119,14 +119,14 @@ resource "aws_cloudfront_distribution" "resume" {
 
   is_ipv6_enabled     = true
 
-  comment             = "Resume - ${title(terraform.workspace)}"
+  comment             = "${title(var.name)} - ${local.environment}"
 
-  default_root_object = var.resumeFileName
+  default_root_object = var.fileName
 
   default_cache_behavior {
     allowed_methods  = [ "GET", "HEAD", "OPTIONS" ]
     cached_methods   = [ "GET", "HEAD" ]
-    target_origin_id = "S3"
+    target_origin_id = aws_cloudfront_origin_access_control.S3.name
 
     compress                = true
     viewer_protocol_policy  = "redirect-to-https"

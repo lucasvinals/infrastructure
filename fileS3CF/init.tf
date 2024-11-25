@@ -7,9 +7,9 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Environment     = title(terraform.workspace)
+      Environment     = local.environment
       CreatedBy       = "Lktz"
-      Module          = "Resume"
+      Module          = "FileS3CF"
     }
   }
 }
