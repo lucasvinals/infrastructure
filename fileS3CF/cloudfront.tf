@@ -99,7 +99,7 @@ data "aws_cloudfront_origin_request_policy" "CORS-S3Origin" {
 }
 
 resource aws_cloudfront_origin_access_control S3 {
-  name                              = "S3Access${local.environment}"
+  name                              = "S3Access-${title(var.name)}-${local.environment}"
   description                       = "Access to S3 buckets - ${local.environment} environment"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
