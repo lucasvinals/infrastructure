@@ -1,11 +1,11 @@
 resource "aws_acm_certificate" "main" {
-  domain_name = var.dnsHostedZoneName
-  subject_alternative_names = [ "*.${var.dnsHostedZoneName}" ]
-  validation_method = "DNS"
+  domain_name               = var.dnsHostedZoneName
+  subject_alternative_names = ["*.${var.dnsHostedZoneName}"]
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = [ tags ]
+    ignore_changes        = [tags]
   }
 }
 
@@ -16,8 +16,8 @@ resource "aws_route53domains_registered_domain" "main" {
 
   dynamic "name_server" {
     for_each = var.dnsNameServers
-    content{
-       name = name_server.value
+    content {
+      name = name_server.value
     }
   }
 }

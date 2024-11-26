@@ -1,4 +1,4 @@
 #Route53
-variable dnsNameServers {}
-variable dnsZoneId {}
-variable dnsHostedZoneName {}
+variable "dnsNameServers" {}
+variable "dnsZoneId" {}
+variable "dnsHostedZoneName" {}

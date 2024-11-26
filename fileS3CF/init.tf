@@ -7,9 +7,9 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Environment     = local.environment
-      CreatedBy       = "Lktz"
-      Module          = "FileS3CF"
+      Environment = local.environment
+      CreatedBy   = "Lucas Viñals"
+      Module      = "FileS3CF"
     }
   }
 }

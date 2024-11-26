@@ -1,10 +1,10 @@
 terraform {
   cloud {
-    organization = "lucasvinals_personal"
+    organization = "lucasvinals"
 
     workspaces {
-      project = "TerraformCourse"
-      tags = [ "CreatedBy_Lktz" ]
+      project = "Main"
+      tags    = ["Intro", "Resume", "Certificates", "DNS"]
     }
   }
 }
@@ -16,9 +16,9 @@ module "dns" {
 module "certs" {
   source = "./certificates"
 
-  dnsZoneId = module.dns.route53.hostedZone.id
+  dnsZoneId         = module.dns.route53.hostedZone.id
   dnsHostedZoneName = module.dns.route53.hostedZone.name
-  dnsNameServers = module.dns.route53.nameServers
+  dnsNameServers    = module.dns.route53.nameServers
 }
 
 # module "webApp" {
@@ -31,23 +31,23 @@ module "certs" {
 module "resume" {
   source = "./fileS3CF"
 
-  dnsZoneId = module.dns.route53.hostedZone.id
-  dnsHostedZoneName = module.dns.route53.hostedZone.name
-  dnsNameServers = module.dns.route53.nameServers
+  dnsZoneId                   = module.dns.route53.hostedZone.id
+  dnsHostedZoneName           = module.dns.route53.hostedZone.name
+  dnsNameServers              = module.dns.route53.nameServers
   acmCertificateValidationARN = module.certs.acmCertificateValidationARN
 
-  name = "resume"
+  name     = "resume"
   fileName = "LucasVinalsCV.pdf"
 }
 
 module "intro" {
   source = "./fileS3CF"
 
-  dnsZoneId = module.dns.route53.hostedZone.id
-  dnsHostedZoneName = module.dns.route53.hostedZone.name
-  dnsNameServers = module.dns.route53.nameServers
+  dnsZoneId                   = module.dns.route53.hostedZone.id
+  dnsHostedZoneName           = module.dns.route53.hostedZone.name
+  dnsNameServers              = module.dns.route53.nameServers
   acmCertificateValidationARN = module.certs.acmCertificateValidationARN
 
-  name = "intro"
+  name     = "intro"
   fileName = "introduction.mov"
 }

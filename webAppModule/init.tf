@@ -7,9 +7,9 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Environment     = title(terraform.workspace)
-      CreatedBy       = "Lktz"
-      Module          = "webApp"
+      Environment = title(terraform.workspace)
+      CreatedBy   = "Lucas Viñals"
+      Module      = "webApp"
     }
   }
 }
