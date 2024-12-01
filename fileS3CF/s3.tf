@@ -21,33 +21,33 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
 }
 
 resource "aws_s3_object" "file" {
-  bucket = aws_s3_bucket.main.bucket
-  key = var.fileName
-  source = "./${path.module}/misc/${var.fileName}"
+  bucket       = aws_s3_bucket.main.bucket
+  key          = var.fileName
+  source       = "./${path.module}/misc/${var.fileName}"
   content_type = local.contentType
 }
 
-data aws_caller_identity current {}
+data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "CFDistributionAccessToS3Bucket" {
   statement {
     sid = "PolicyGetObjectS3Bucket"
 
-    actions = [ "s3:GetObject" ]
+    actions = ["s3:GetObject"]
 
     principals {
-      type = "Service"
-      identifiers = [ "cloudfront.amazonaws.com" ]
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
     }
 
-    resources = [ "${aws_s3_bucket.main.arn}/*" ]
+    resources = ["${aws_s3_bucket.main.arn}/*"]
 
     effect = "Allow"
 
     condition {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "AWS:SourceArn"
-      values = [ "arn:aws:cloudfront::${local.accountId}:distribution/${aws_cloudfront_distribution.main.id}" ]
+      values   = ["arn:aws:cloudfront::${local.accountId}:distribution/${aws_cloudfront_distribution.main.id}"]
     }
   }
 }
