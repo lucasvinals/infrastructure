@@ -36,8 +36,9 @@ module "resume" {
   dnsNameServers              = module.dns.route53.nameServers
   acmCertificateValidationARN = module.certs.acmCertificateValidationARN
 
-  name     = "resume"
-  fileName = "LucasVinalsCV.pdf"
+  name        = "resume"
+  fileName    = "resume.webp"
+  contentType = "image/webp"
 }
 
 module "intro" {

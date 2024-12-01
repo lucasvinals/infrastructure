@@ -1,9 +1,9 @@
 locals {
-  functionName = "SecureHeaders-${local.environment}"
+  functionName = "SecureHeaders-${title(var.name)}-${local.environment}"
 }
 
 resource "aws_cloudfront_function" "secureHeaders" {
-  name = local.functionName
+  name    = local.functionName
   runtime = "cloudfront-js-2.0"
   code    = <<EOF
     async function handler(event) {
@@ -23,15 +23,15 @@ resource "aws_cloudfront_response_headers_policy" "SecureHeaders" {
 
   cors_config {
     access_control_allow_methods {
-      items = [ "GET", "HEAD", "OPTIONS" ]
+      items = ["GET", "HEAD", "OPTIONS"]
     }
 
     access_control_allow_headers {
-      items = [ "origin", "content-type", "accept" ]
+      items = ["origin", "content-type", "accept"]
     }
 
     access_control_allow_origins {
-      items = [ "*.${var.dnsHostedZoneName}" ]
+      items = ["*.${var.dnsHostedZoneName}"]
     }
 
     access_control_max_age_sec = 600
@@ -48,10 +48,10 @@ resource "aws_cloudfront_response_headers_policy" "SecureHeaders" {
     }
 
     strict_transport_security {
-      access_control_max_age_sec  = 31536000
-      override                    = true
-      include_subdomains          = true
-      preload                     = true
+      access_control_max_age_sec = 31536000
+      override                   = true
+      include_subdomains         = true
+      preload                    = true
     }
 
     xss_protection {
@@ -77,15 +77,15 @@ resource "aws_cloudfront_response_headers_policy" "SecureHeaders" {
 
   custom_headers_config {
     items {
-      header = "createdby"
+      header   = "createdby"
       override = true
-      value = "Lucas Vinals"
+      value    = "Lucas Vinals"
     }
 
     items {
-      header = "this-is-a-test"
+      header   = "this-is-a-test"
       override = true
-      value = "EstoEsDeCFResponsePolicy"
+      value    = "EstoEsDeCFResponsePolicy"
     }
   }
 }
@@ -98,7 +98,7 @@ data "aws_cloudfront_origin_request_policy" "CORS-S3Origin" {
   id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Import from Managed AWS Policy
 }
 
-resource aws_cloudfront_origin_access_control S3 {
+resource "aws_cloudfront_origin_access_control" "S3" {
   name                              = "S3Access-${title(var.name)}-${local.environment}"
   description                       = "Access to S3 buckets - ${local.environment} environment"
   origin_access_control_origin_type = "s3"
@@ -108,36 +108,36 @@ resource aws_cloudfront_origin_access_control S3 {
 
 resource "aws_cloudfront_distribution" "main" {
   origin {
-    domain_name = aws_s3_bucket.main.bucket_regional_domain_name
-    origin_id = aws_cloudfront_origin_access_control.S3.name
+    domain_name              = aws_s3_bucket.main.bucket_regional_domain_name
+    origin_id                = aws_cloudfront_origin_access_control.S3.name
     origin_access_control_id = aws_cloudfront_origin_access_control.S3.id
   }
 
-  aliases = [ local.route53Alias ]
+  aliases = [local.route53Alias]
 
   enabled = true
 
-  is_ipv6_enabled     = true
+  is_ipv6_enabled = true
 
-  comment             = "${title(var.name)} - ${local.environment}"
+  comment = "${title(var.name)} - ${local.environment}"
 
   default_root_object = var.fileName
 
   default_cache_behavior {
-    allowed_methods  = [ "GET", "HEAD", "OPTIONS" ]
-    cached_methods   = [ "GET", "HEAD" ]
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_cloudfront_origin_access_control.S3.name
 
-    compress                = true
-    viewer_protocol_policy  = "redirect-to-https"
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
 
     function_association {
-      event_type = "viewer-response"
+      event_type   = "viewer-response"
       function_arn = aws_cloudfront_function.secureHeaders.arn
     }
 
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.CORS-S3Origin.id
-    cache_policy_id = data.aws_cloudfront_cache_policy.CachingOptimized.id
+    origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.CORS-S3Origin.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.CachingOptimized.id
     response_headers_policy_id = aws_cloudfront_response_headers_policy.SecureHeaders.id
   }
 
@@ -148,9 +148,9 @@ resource "aws_cloudfront_distribution" "main" {
       restriction_type = "none"
     }
   }
-  
+
   viewer_certificate {
-    acm_certificate_arn = var.acmCertificateValidationARN
+    acm_certificate_arn      = var.acmCertificateValidationARN
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
