@@ -3,13 +3,13 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 
   default_tags {
     tags = {
-      Environment = title(terraform.workspace)
+      Environment = title(local.environment)
       CreatedBy   = "Lucas Viñals"
-      Module      = "DNS"
+      Module      = upper(element(split("/", path.module), length(split("/", path.module)) - 1))
     }
   }
 }

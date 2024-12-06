@@ -4,37 +4,18 @@ terraform {
 
     workspaces {
       project = "Main"
-      tags    = ["Intro", "Resume", "Certificates", "DNS"]
+      name    = "production"
     }
   }
 }
 
-module "dns" {
-  source = "./dnsZone"
-}
-
-module "certs" {
-  source = "./certificates"
-
-  dnsZoneId         = module.dns.route53.hostedZone.id
-  dnsHostedZoneName = module.dns.route53.hostedZone.name
-  dnsNameServers    = module.dns.route53.nameServers
-}
-
-# module "webApp" {
-#   source = "./webAppModule"
-
-#   dnsZoneId = module.dns.route53.hostedZone.id
-#   dnsHostedZoneName = module.dns.route53.hostedZone.name
-# }
-
 module "resume" {
-  source = "./fileS3CF"
+  source = "../../modules/publishFiles"
 
   dnsZoneId                   = module.dns.route53.hostedZone.id
   dnsHostedZoneName           = module.dns.route53.hostedZone.name
   dnsNameServers              = module.dns.route53.nameServers
-  acmCertificateValidationARN = module.certs.acmCertificateValidationARN
+  acmCertificateValidationARN = module.certificates.acmCertificateValidationARN
 
   name        = "resume"
   fileName    = "resume.webp"
@@ -42,13 +23,30 @@ module "resume" {
 }
 
 module "intro" {
-  source = "./fileS3CF"
+  source = "../../modules/publishFiles"
 
   dnsZoneId                   = module.dns.route53.hostedZone.id
   dnsHostedZoneName           = module.dns.route53.hostedZone.name
   dnsNameServers              = module.dns.route53.nameServers
-  acmCertificateValidationARN = module.certs.acmCertificateValidationARN
+  acmCertificateValidationARN = module.certificates.acmCertificateValidationARN
 
   name     = "intro"
   fileName = "introduction.mov"
+}
+
+module "dns" {
+  source = "../../modules/dns"
+}
+
+module "certificates" {
+  source = "../../modules/certificates"
+
+  dnsZoneId         = module.dns.route53.hostedZone.id
+  dnsHostedZoneName = module.dns.route53.hostedZone.name
+  dnsNameServers    = module.dns.route53.nameServers
+}
+
+moved {
+  from = module.certs
+  to   = module.certificates
 }

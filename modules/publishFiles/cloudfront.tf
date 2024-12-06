@@ -1,5 +1,5 @@
 locals {
-  functionName = "SecureHeaders-${title(var.name)}-${local.environment}"
+  functionName = "SecureHeaders-${local.name}-${local.environment}"
 }
 
 resource "aws_cloudfront_function" "secureHeaders" {
@@ -99,7 +99,7 @@ data "aws_cloudfront_origin_request_policy" "CORS-S3Origin" {
 }
 
 resource "aws_cloudfront_origin_access_control" "S3" {
-  name                              = "S3Access-${title(var.name)}-${local.environment}"
+  name                              = "S3Access-${local.name}-${local.environment}"
   description                       = "Access to S3 buckets - ${local.environment} environment"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
@@ -119,7 +119,7 @@ resource "aws_cloudfront_distribution" "main" {
 
   is_ipv6_enabled = true
 
-  comment = "${title(var.name)} - ${local.environment}"
+  comment = "${local.name} - ${local.environment}"
 
   default_root_object = var.fileName
 

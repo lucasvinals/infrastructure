@@ -2,4 +2,4 @@
 .terraform.lock.hcl
 configure.tf
 imports.tf
-# misc/
+misc/

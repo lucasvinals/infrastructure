@@ -10,7 +10,7 @@ resource "aws_acm_certificate" "main" {
 }
 
 resource "aws_route53domains_registered_domain" "main" {
-  count = terraform.workspace == "production" ? 1 : 0
+  count = local.isProduction ? 1 : 0
 
   domain_name = var.dnsHostedZoneName
 
